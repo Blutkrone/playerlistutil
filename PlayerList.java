@@ -153,6 +153,7 @@ public class PlayerList {
 	private Map<Integer, String> datasOLD = new HashMap<Integer, String>();
 
 	private UUID ownerUUID;
+	private WeakReference<Player> weakplayer = new WeakRefernce<>(null);
 	private String[] tabs;
 	private boolean[] hasCustomTexture;
 	private int size = 0;
@@ -596,13 +597,19 @@ public class PlayerList {
 		return ReflectionUtil.invokeMethod(CRAFTPLAYERCLASS.cast(player), "getHandle", new Class[0]);
 	}
 
+
 	/**
-	 * Returns the player.
-	 * 
-	 * @return the player (if they are online), or null (if they are offline)
-	 */
+	* Returns the player.
+	*
+	* @return the player (if they are online), or null (if they are offline)
+	*/
 	public Player getPlayer() {
-		return Bukkit.getPlayer(this.ownerUUID);
+		Player whackplayer = weakPlayer.get();
+		if (whackplayer == null || !whackplayer.isValid()) {
+		    whackplayer = Bukkit.getPlayer(this.ownerUUID);
+		    weakPlayer = new WeakReference<>(whackplayer);
+		}
+		return whackplayer;
 	}
 
 	/**
